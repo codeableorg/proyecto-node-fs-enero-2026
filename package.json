@@ -1,0 +1,16 @@
+{
+  "name": "proyecto-node-fs-enero-2026",
+  "version": "1.0.0",
+  "description": "proyecto de aprendizaje de node - fs 2026",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node",
+    "js",
+    "express"
+  ],
+  "author": "Carlos Rodriguez <carlos15erh@gmail.com>",
+  "license": "MIT"
+}

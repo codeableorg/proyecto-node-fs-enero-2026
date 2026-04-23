@@ -1,3 +1,4 @@
+import { readFileSync, readFile } from 'node:fs';
 import { createServer } from 'node:http';
 
 const server = createServer((req, res) => {
@@ -23,6 +24,24 @@ const server = createServer((req, res) => {
     return;
   }
 
+  if (method === 'GET' && url === '/archivo') {
+    console.log('Leyendo el archivo...');
+
+    //readFileSync
+    readFile('text.txt', 'utf-8', (err, data) => {
+      console.log('Error', err);
+
+      console.log(data);
+      res.writeHead(200, { 'content-type': 'text/plain' });
+      res.end(data);
+    }); // 1s
+    readFile('text.txt', 'utf-8', (err, data) => {
+      console.log('Error', err);
+      console.log(data);
+    });
+    return;
+  }
+
   // Ruta de health
   if (method === 'GET' && url === '/health') {
     res.writeHead(200, { 'content-type': 'application/json' });
@@ -45,16 +64,18 @@ const server = createServer((req, res) => {
 //   });
 // };
 
-// listen(server, 3000).then((mensaje) => {
-//   console.log(mensaje);
-// });
+// listen(server, 3000)
+//   .then((mensaje) => {
+//     console.log(mensaje);
+//   })
+//   .catch(() => {});
 
-await new Promise((resolve) => server.listen(3000, resolve));
+const message = await new Promise((resolve) =>
+  server.listen(3000, () => resolve('Servidor encendido'))
+);
 
-// server.listen(3000, (err) => {
-//   if (err) {
-//     console.error(err);
-//     return;
-//   }
+console.log(message);
+
+// server.listen(3000, () => {
 //   console.log('El servidor va bien');
 // });

@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 
 import { createServer } from 'node:http';
 
-const server = createServer((req, res) => {
+const server = createServer(async (req, res) => {
   const { method, url } = req;
 
   // Ruta home
@@ -29,21 +29,13 @@ const server = createServer((req, res) => {
   if (method === 'GET' && url === '/archivo') {
     console.log('Leyendo el archivo...');
 
-    readFile('text1.txt', 'utf-8')
-      .then((data) => {
-        console.log(data);
-        res.writeHead(200, { 'content-type': 'text/plain' });
-        res.end(data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    const data = await readFile('text.txt', 'utf-8');
+    console.log(data);
+    res.writeHead(200, { 'content-type': 'text/plain' });
+    res.end(data);
 
-    readFile('text.txt', 'utf-8').then((data) => {
-      console.log(data);
-      // res.writeHead(200, { 'content-type': 'text/plain' });
-      // res.end(data);
-    });
+    const data1 = await readFile('text.txt', 'utf-8');
+    console.log(data1);
 
     return;
   }

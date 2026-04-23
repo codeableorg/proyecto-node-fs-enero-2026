@@ -1,4 +1,6 @@
-import { readFileSync, readFile } from 'node:fs';
+// import { readFileSync, readFile } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+
 import { createServer } from 'node:http';
 
 const server = createServer((req, res) => {
@@ -27,18 +29,22 @@ const server = createServer((req, res) => {
   if (method === 'GET' && url === '/archivo') {
     console.log('Leyendo el archivo...');
 
-    //readFileSync
-    readFile('text.txt', 'utf-8', (err, data) => {
-      console.log('Error', err);
+    readFile('text1.txt', 'utf-8')
+      .then((data) => {
+        console.log(data);
+        res.writeHead(200, { 'content-type': 'text/plain' });
+        res.end(data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
+    readFile('text.txt', 'utf-8').then((data) => {
       console.log(data);
-      res.writeHead(200, { 'content-type': 'text/plain' });
-      res.end(data);
-    }); // 1s
-    readFile('text.txt', 'utf-8', (err, data) => {
-      console.log('Error', err);
-      console.log(data);
+      // res.writeHead(200, { 'content-type': 'text/plain' });
+      // res.end(data);
     });
+
     return;
   }
 

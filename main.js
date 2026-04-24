@@ -29,15 +29,40 @@ const server = createServer(async (req, res) => {
   if (method === 'GET' && url === '/archivo') {
     console.log('Leyendo el archivo...');
 
-    const data = await readFile('text.txt', 'utf-8');
-    console.log(data);
-    res.writeHead(200, { 'content-type': 'text/plain' });
-    res.end(data);
+    try {
+      const promise1 = readFile('text.txt', 'utf-8');
+      console.log(promise1);
 
-    const data1 = await readFile('text.txt', 'utf-8');
-    console.log(data1);
+      const promise2 = readFile('text1.txt', 'utf-8');
 
-    return;
+      console.log(promise2);
+
+      const result = await Promise.race([promise1, promise2]);
+      // let data;
+      // for (const promise of results) {
+      //   if (promise.status === 'fulfilled') {
+      //     data = promise.value;
+      //     console.log(data);
+
+      //     break;
+      //   }
+      // }
+
+      if (result) {
+        res.writeHead(200, { 'content-type': 'text/plain' });
+        res.end(result);
+      } else {
+        res.writeHead(204);
+        res.end();
+      }
+
+      return;
+    } catch (error) {
+      console.error(error);
+
+      res.end('Algo malo pasó');
+      return;
+    }
   }
 
   // Ruta de health

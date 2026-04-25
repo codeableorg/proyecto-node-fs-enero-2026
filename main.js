@@ -1,39 +1,39 @@
 // import { readFileSync, readFile } from 'node:fs';
-import { readFile } from 'node:fs/promises';
+import { readFile } from "node:fs/promises";
 
-import { createServer } from 'node:http';
+import { createServer } from "node:http";
 
 const server = createServer(async (req, res) => {
   const { method, url } = req;
 
   // Ruta home
-  if (method === 'GET' && url === '/') {
-    res.writeHead(200, { 'content-type': 'text/plain' });
-    res.end('Hola mundo este es el home');
+  if (method === "GET" && url === "/") {
+    res.writeHead(200, { "content-type": "text/plain" });
+    res.end("Hola mundo este es el home");
     return;
   }
 
   // Ruta de la api
-  if (method === 'GET' && url === '/api') {
-    res.writeHead(200, { 'content-type': 'application/json' });
+  if (method === "GET" && url === "/api") {
+    res.writeHead(200, { "content-type": "application/json" });
     res.end(
       JSON.stringify({
-        message: 'Respuesta en JSON desde la api',
+        message: "Respuesta en JSON desde la api",
         code: 200,
-        status: 'ok'
-      })
+        status: "ok",
+      }),
     );
     return;
   }
 
-  if (method === 'GET' && url === '/archivo') {
-    console.log('Leyendo el archivo...');
+  if (method === "GET" && url === "/archivo") {
+    console.log("Leyendo el archivo...");
 
     try {
-      const promise1 = readFile('text.txt', 'utf-8');
+      const promise1 = readFile("text.txt", "utf-8");
       console.log(promise1);
 
-      const promise2 = readFile('text1.txt', 'utf-8');
+      const promise2 = readFile("text1.txt", "utf-8");
 
       console.log(promise2);
 
@@ -49,7 +49,7 @@ const server = createServer(async (req, res) => {
       // }
 
       if (result) {
-        res.writeHead(200, { 'content-type': 'text/plain' });
+        res.writeHead(200, { "content-type": "text/plain" });
         res.end(result);
       } else {
         res.writeHead(204);
@@ -60,25 +60,25 @@ const server = createServer(async (req, res) => {
     } catch (error) {
       console.error(error);
 
-      res.end('Algo malo pasó');
+      res.end("Algo malo pasó");
       return;
     }
   }
 
   // Ruta de health
-  if (method === 'GET' && url === '/health') {
-    res.writeHead(200, { 'content-type': 'application/json' });
+  if (method === "GET" && url === "/health") {
+    res.writeHead(200, { "content-type": "application/json" });
     res.end(
       JSON.stringify({
-        message: 'Respuesta en JSON desde health',
+        message: "Respuesta en JSON desde health",
         code: 200,
-        status: 'ok'
-      })
+        status: "ok",
+      }),
     );
     return;
   }
 
-  res.end('Hola mundo');
+  res.end("Hola mundo");
 });
 
 // const listen = (server, port) => {
@@ -94,7 +94,7 @@ const server = createServer(async (req, res) => {
 //   .catch(() => {});
 
 const message = await new Promise((resolve) =>
-  server.listen(3000, () => resolve('Servidor encendido'))
+  server.listen(3000, () => resolve("Servidor encendido")),
 );
 
 console.log(message);

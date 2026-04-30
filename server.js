@@ -1,46 +1,41 @@
 import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { extname, join, resolve } from "node:path";
+import { sendHtml, sendJson } from "./utils/response.js";
+import { getLayout } from "./utils/html.js";
 
-console.log("Probando");
-
-const html = `
-    <!doctype html>
-    <html lang="es">
-      <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <link rel="stylesheet" href="/styles.css" />
-          <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-          <title>Vanilla Node Web Server</title>
-      </head>
-      <body>
-          <h1>Bienvenido a Vanilla Node Web Server</h1>
-          <section>
-            <h2>Prueba la API</h2>
-            <ul>
-              <li><a href="/api/health">/api/health</a></li>
-              <li><a href="/api/time">/api/time</a></li>
-            </ul>
-          </section>
-          <section>
-            <h2>Conoce a la mascota</h2>
-            <figure>
-              <img src="node-mascot.svg" alt="Mascota de Node.js" width="120" />
-              <figcaption>Mascota de Node.js</figcaption>
-            </figure>
-          </section>
-      </body>
-    </html>
+const home = `
+    <h1>Bienvenido a Vanilla Node Web Server</h1>
+    <section>
+      <h2>Prueba la API</h2>
+      <ul>
+        <li><a href="/api/health">/api/health</a></li>
+        <li><a href="/api/time">/api/time</a></li>
+      </ul>
+    </section>
+    <section>
+      <h2>Conoce a la mascota</h2>
+      <figure>
+        <img src="node-mascot.svg" alt="Mascota de Node.js" width="120" />
+        <figcaption>Mascota de Node.js</figcaption>
+      </figure>
+    </section>
   `;
 
-const a = 2;
+const contact = "<h1>Escríbenos</h1>";
+
 async function requestListener(req, res) {
   const { url } = req;
 
   if (url === "/") {
-    res.writeHead(200, { "Content-Type": "text/html" });
-    res.end(html);
+    const pagina = getLayout("Home", home);
+    sendHtml(res, pagina);
+    return;
+  }
+
+  if (url === "/contact") {
+    const pagina = getLayout("Contacto", contact);
+    sendHtml(res, pagina);
     return;
   }
 
@@ -81,8 +76,8 @@ async function requestListener(req, res) {
       return res.end(data);
     } catch {
       // Si el archivo no existe, simplemente respondemos 404
-      res.writeHead(404);
-      return res.end();
+      sendJson(res, { error: "No encontrado" }, 404);
+      return;
     }
   } else if (ext === ".css") {
     try {

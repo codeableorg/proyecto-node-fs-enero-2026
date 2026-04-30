@@ -3,24 +3,8 @@ import { createServer } from "node:http";
 import { extname, join, resolve } from "node:path";
 import { sendHtml, sendJson } from "./utils/response.js";
 import { getLayout } from "./utils/html.js";
-
-const home = `
-    <h1>Bienvenido a Vanilla Node Web Server</h1>
-    <section>
-      <h2>Prueba la API</h2>
-      <ul>
-        <li><a href="/api/health">/api/health</a></li>
-        <li><a href="/api/time">/api/time</a></li>
-      </ul>
-    </section>
-    <section>
-      <h2>Conoce a la mascota</h2>
-      <figure>
-        <img src="node-mascot.svg" alt="Mascota de Node.js" width="120" />
-        <figcaption>Mascota de Node.js</figcaption>
-      </figure>
-    </section>
-  `;
+import { getHealth, getTime } from "./handlers/apiHandlers.js";
+import { getHome } from "./handlers/viewHandlers.js";
 
 const contact = "<h1>Escríbenos</h1>";
 
@@ -28,8 +12,7 @@ async function requestListener(req, res) {
   const { url } = req;
 
   if (url === "/") {
-    const pagina = getLayout("Home", home);
-    sendHtml(res, pagina);
+    getHome(req, res);
     return;
   }
 
@@ -40,29 +23,13 @@ async function requestListener(req, res) {
   }
 
   if (url === "/api/health") {
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ status: "ok" }));
+    getHealth(req, res);
     return;
   }
 
   if (url === "/api/time") {
-    const date = new Date();
-    const time = date.toISOString();
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ time: time }));
+    getTime(req, res);
   }
-
-  // if (url === "/node-mascot.svg") {
-  //   try {
-  //     const data = await readFile("node-mascot.svg");
-  //     // Es clave enviar el Content-Type correcto para que el navegador sepa qué hacer con los datos
-  //     res.writeHead(200, { "Content-Type": "image/svg+xml" });
-  //     return res.end(data);
-  //   } catch {
-  //     res.writeHead(404);
-  //     return res.end();
-  //   }
-  // }
 
   const PUBLIC_DIR = resolve("public");
   // Asumimos el riesgo de un ataque 'Directory Traversal' por ahora

@@ -67,6 +67,10 @@ async function requestListener(req, res) {
       return res.end();
     }
   }
+
+  res.writeHead(404);
+  res.end();
+  return;
 }
 
 const server = createServer(requestListener);

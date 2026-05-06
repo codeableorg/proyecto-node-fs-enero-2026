@@ -1,12 +1,9 @@
 import { readFile } from "node:fs/promises";
 import { createServer } from "node:http";
 import { extname, join, resolve } from "node:path";
-import { sendHtml, sendJson } from "./utils/response.js";
-import { getLayout } from "./utils/html.js";
+import { sendJson } from "./utils/response.js";
 import { getHealth, getTime } from "./handlers/apiHandlers.js";
-import { getHome } from "./handlers/viewHandlers.js";
-
-const contact = "<h1>Escríbenos</h1>";
+import { getContact, getHome } from "./handlers/viewHandlers.js";
 
 async function requestListener(req, res) {
   const { url } = req;
@@ -17,8 +14,7 @@ async function requestListener(req, res) {
   }
 
   if (url === "/contact") {
-    const pagina = getLayout("Contacto", contact);
-    sendHtml(res, pagina);
+    getContact(req, res);
     return;
   }
 

@@ -19,7 +19,14 @@ const home = `
     </section>
   `;
 
+const contact = "<h1>Escríbenos</h1>";
+
 export async function getHome(_req, res) {
   const pagina = getLayout("Inicio", home);
+  sendHtml(res, pagina);
+}
+
+export async function getContact(_req, res) {
+  const pagina = getLayout("Contacto", contact);
   sendHtml(res, pagina);
 }

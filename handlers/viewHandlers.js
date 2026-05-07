@@ -19,7 +19,26 @@ const home = `
     </section>
   `;
 
-const contact = "<h1>Escríbenos</h1>";
+const contact = `
+    <section>
+      <h2>Formulario de Contacto</h2>
+      <form action="/contact" method="POST">
+        <div>
+          <label for="name">Nombre:</label>
+          <input type="text" id="name" name="name" required />
+        </div>
+        <div>
+          <label for="email">Correo electrónico:</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+        <div>
+          <label for="message">Mensaje:</label>
+          <textarea id="message" name="message" required></textarea>
+        </div>
+        <button type="submit">Enviar</button>
+      </form>
+    </section>
+  `;
 
 export async function getHome(_req, res) {
   const pagina = getLayout("Inicio", home);
@@ -27,6 +46,6 @@ export async function getHome(_req, res) {
 }
 
 export async function getContact(_req, res) {
-  const pagina = getLayout("Contacto", contact);
+  const pagina = getLayout("Nuevo Contacto", contact);
   sendHtml(res, pagina);
 }

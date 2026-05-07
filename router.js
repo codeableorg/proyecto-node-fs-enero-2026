@@ -3,7 +3,7 @@ import { staticHandler } from "./handlers/staticHandlers.js";
 import { getContact, getHome } from "./handlers/viewHandlers.js";
 
 export async function router(req, res) {
-  const { url: pathname } = req;
+  const { url: pathname, method } = req;
 
   // Rutas de API
   if (pathname === "/api/health") {
@@ -14,9 +14,27 @@ export async function router(req, res) {
     return await getTime(req, res);
   }
 
-  if (pathname === "/contact") {
-    getContact(req, res);
-    return;
+  if (pathname === "/contact" && method === "GET") {
+    return await getContact(req, res);
+  }
+
+  if (pathname === "/contact" && method === "POST") {
+    let body = "";
+
+    req.on("data", (chunk) => {
+      console.log(chunk);
+
+      // Los chunks llegan como Buffer (bytes), los convertimos a string
+      body += chunk.toString();
+    });
+    req.on("end", () => {
+      console.log("Cuerpo recibido:", body);
+      // Salida típica: name=Juan&email=juan@mail.com&message=Hola
+    });
+
+    // Por ahora, sólo probamos que el router funciona
+    res.writeHead(200);
+    return res.end("Recibiendo tu mensaje...");
   }
 
   // Rutas de Vistas

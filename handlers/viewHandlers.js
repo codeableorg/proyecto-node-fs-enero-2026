@@ -1,5 +1,6 @@
 import { sendHtml } from "../utils/response.js";
 import { getLayout } from "../utils/html.js";
+import { parseUrlEncoded } from "../utils/bodyParser.js";
 
 const home = `
     <h1>Bienvenido a Vanilla Node Web Server</h1>
@@ -48,4 +49,19 @@ export async function getHome(_req, res) {
 export async function getContact(_req, res) {
   const pagina = getLayout("Nuevo Contacto", contact);
   sendHtml(res, pagina);
+}
+
+export async function postContact(req, res) {
+  const body = await parseUrlEncoded(req);
+  const { name, email, message } = body;
+
+  console.log(name, email, message);
+
+  if (!name || !email || !message) {
+    res.writeHead(400); // 400 Bad Request
+    return res.end();
+  }
+
+  res.writeHead(200);
+  return res.end("Recibiendo tu mensaje...");
 }

@@ -8,3 +8,11 @@ async function requestListener(req, res) {
 
 const server = createServer(requestListener);
 server.listen(3000);
+
+// process.on("", () => {
+//   console.log("Apagando servidor");
+
+//   server.close(() => {
+//     console.log("Servidor cerrado correctamente");
+//   });
+// });

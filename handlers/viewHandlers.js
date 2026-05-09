@@ -1,6 +1,9 @@
 import { sendHtml } from "../utils/response.js";
+
 import { getLayout } from "../utils/html.js";
 import { parseUrlEncoded } from "../utils/bodyParser.js";
+import path from "node:path";
+import fs from "node:fs/promises";
 
 const home = `
     <h1>Bienvenido a Vanilla Node Web Server</h1>
@@ -51,6 +54,9 @@ export async function getContact(_req, res) {
   sendHtml(res, pagina);
 }
 
+const DATA_DIR = path.join(import.meta.dirname, "../data");
+const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
+
 export async function postContact(req, res) {
   const body = await parseUrlEncoded(req);
   const { name, email, message } = body;
@@ -62,6 +68,44 @@ export async function postContact(req, res) {
     return res.end();
   }
 
+  let messages = [];
+  // Intentamos leer los mensajes existentes del archivo JSON.
+  try {
+    const data = await fs.readFile(MESSAGES_FILE, "utf-8");
+    console.log(data);
+    console.log("----------------------");
+
+    messages = JSON.parse(data);
+    console.log(messages);
+  } catch (error) {
+    console.log(error);
+
+    if (error.code === "ENOENT") {
+      // Si el archivo no existe, solo nos aseguramos de que el directorio
+      // data existe para la futura escritura (messages ya se inicializó como `[]`)
+      await fs.mkdir(DATA_DIR, { recursive: true });
+    } else {
+      // Cualquier otro error se trata como un error de servidor.
+      const status = 500; // Internal Server Error
+      res.writeHead(status);
+      return res.end();
+    }
+  }
+
+  messages.push({
+    name,
+    email,
+    message,
+    timestamp: new Date().toISOString(),
+  });
+
+  const dataToWrite = JSON.stringify(messages, null, 2);
+  console.log(dataToWrite);
+  await fs.writeFile(MESSAGES_FILE, dataToWrite);
+
+  console.log("Aqui estamos");
+
   res.writeHead(200);
-  return res.end("Recibiendo tu mensaje...");
+  res.end("Recibiendo tu mensaje");
+  return;
 }

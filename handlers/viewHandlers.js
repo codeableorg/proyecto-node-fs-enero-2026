@@ -1,4 +1,4 @@
-import { sendHtml } from "../utils/response.js";
+import { sendHtml, sendHtmlError } from "../utils/response.js";
 
 import { getLayout } from "../utils/html.js";
 import { parseUrlEncoded } from "../utils/bodyParser.js";
@@ -58,14 +58,18 @@ const DATA_DIR = path.join(import.meta.dirname, "../data");
 const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
 
 export async function postContact(req, res) {
-  const body = await parseUrlEncoded(req);
+  let body;
+  try {
+    body = await parseUrlEncoded(req);
+  } catch {
+    return sendHtmlError(res, "Error interno del servidor");
+  }
   const { name, email, message } = body;
 
   console.log(name, email, message);
 
   if (!name || !email || !message) {
-    res.writeHead(400); // 400 Bad Request
-    return res.end();
+    return sendHtmlError(res, "Faltan campos requeridos", 400);
   }
 
   let messages = [];

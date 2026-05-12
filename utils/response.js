@@ -1,6 +1,18 @@
+import { getLayout } from "./html.js";
+
 export function sendJson(res, data, status = 200) {
   res.writeHead(status, { "Content-Type": "application/json" });
   res.end(JSON.stringify(data));
+}
+
+export function sendHtmlError(res, message, status = 500) {
+  const content = `
+    <h1>Error ${status}</h1>
+    <p>${message}</p>
+    <a href="/">Volver al inicio</a>
+  `;
+  const html = getLayout(`Error ${status}`, content);
+  sendHtml(res, html, status);
 }
 
 export function sendHtml(res, html, status = 200) {

@@ -1,5 +1,9 @@
 import { getLayout } from "./html.js";
 
+export function sendJsonError(res, message, status = 500) {
+  sendJson(res, { error: message }, status);
+}
+
 export function sendJson(res, data, status = 200) {
   res.writeHead(status, { "Content-Type": "application/json" });
   res.end(JSON.stringify(data));

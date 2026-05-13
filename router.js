@@ -1,7 +1,7 @@
 import { getHealth, getTime } from "./handlers/apiHandlers.js";
 import { staticHandler } from "./handlers/staticHandlers.js";
 import { getContact, getHome, postContact } from "./handlers/viewHandlers.js";
-import { sendHtmlError } from "./utils/response.js";
+import { sendHtmlError, sendJsonError } from "./utils/response.js";
 
 export async function router(req, res) {
   const { url: pathname, method } = req;
@@ -38,6 +38,10 @@ export async function router(req, res) {
     const message =
       status === 500 ? "Error interno del servidor" : error.message;
 
-    sendHtmlError(res, message, status);
+    if (pathname.startsWith("/api")) {
+      sendJsonError(res, message, status);
+    } else {
+      sendHtmlError(res, message, status);
+    }
   }
 }

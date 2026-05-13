@@ -4,6 +4,7 @@ import { getLayout } from "../utils/html.js";
 import { parseUrlEncoded } from "../utils/bodyParser.js";
 import path from "node:path";
 import fs from "node:fs/promises";
+import { HttpError } from "../utils/errors.js";
 
 const home = `
     <h1>Bienvenido a Vanilla Node Web Server</h1>
@@ -69,7 +70,7 @@ export async function postContact(req, res) {
   console.log(name, email, message);
 
   if (!name || !email || !message) {
-    return sendHtmlError(res, "Faltan campos requeridos", 400);
+    throw new HttpError("Faltan campos requeridos", 400);
   }
 
   let messages = [];

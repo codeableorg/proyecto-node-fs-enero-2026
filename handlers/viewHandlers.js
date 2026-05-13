@@ -104,10 +104,7 @@ export async function postContact(req, res) {
   });
 
   const dataToWrite = JSON.stringify(messages, null, 2);
-  console.log(dataToWrite);
   await fs.writeFile(MESSAGES_FILE, dataToWrite);
-
-  console.log("Aqui estamos");
 
   res.writeHead(200);
   res.end("Recibiendo tu mensaje");

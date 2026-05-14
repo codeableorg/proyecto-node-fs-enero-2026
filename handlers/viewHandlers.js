@@ -58,6 +58,18 @@ export async function getContact(_req, res) {
 const DATA_DIR = path.join(import.meta.dirname, "../data");
 const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
 
+async function ensureMessagesFileExists() {
+  await fs.mkdir(DATA_DIR, { recursive: true });
+
+  try {
+    await fs.writeFile(MESSAGES_FILE, "[]", { flag: "wx" });
+  } catch (error) {
+    if (error.code !== "EEXIST") {
+      throw error;
+    }
+  }
+}
+
 export async function postContact(req, res) {
   let body;
   try {
@@ -67,34 +79,22 @@ export async function postContact(req, res) {
   }
   const { name, email, message } = body;
 
-  console.log(name, email, message);
-
   if (!name || !email || !message) {
     throw new HttpError("Faltan campos requeridos", 400);
   }
 
-  let messages = [];
-  // Intentamos leer los mensajes existentes del archivo JSON.
+  let messages;
   try {
+    await ensureMessagesFileExists();
+
     const data = await fs.readFile(MESSAGES_FILE, "utf-8");
-    console.log(data);
-    console.log("----------------------");
 
-    messages = JSON.parse(data);
-    console.log(messages);
-  } catch (error) {
-    console.log(error);
-
-    if (error.code === "ENOENT") {
-      // Si el archivo no existe, solo nos aseguramos de que el directorio
-      // data existe para la futura escritura (messages ya se inicializó como `[]`)
-      await fs.mkdir(DATA_DIR, { recursive: true });
-    } else {
-      // Cualquier otro error se trata como un error de servidor.
-      const status = 500; // Internal Server Error
-      res.writeHead(status);
-      return res.end();
-    }
+    messages = data.trim() ? JSON.parse(data) : [];
+  } catch {
+    // Cualquier otro error se trata como un error de servidor.
+    const status = 500; // Internal Server Error
+    res.writeHead(status);
+    return res.end();
   }
 
   messages.push({

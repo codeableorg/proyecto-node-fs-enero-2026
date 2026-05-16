@@ -26,6 +26,13 @@ export async function staticHandler(_req, res, pathname) {
     const readStream = fs.createReadStream(filePath);
 
     readStream.pipe(res);
+
+    readStream.on("error", (err) => {
+      // Con el listener, el proceso sobrevive pero la conexión se cierra abruptamente
+      // ya que ya enviamos headers con status 200.
+      console.error("Error durante streaming:", err);
+      res.end(); // Cerramos la respuesta para liberar recursos
+    });
   } catch (error) {
     if (error.code === "ENOENT" || error.code === "EISDIR") {
       throw new HttpError("Recurso no encontrado", 404);

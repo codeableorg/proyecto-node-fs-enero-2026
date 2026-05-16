@@ -70,10 +70,13 @@ async function ensureMessagesFileExists() {
   }
 }
 
-export async function postContact(req, res) {
-  let body;
+export async function postContact(req, res, opts = {}) {
+  let body = opts.body;
+  const { retried = false } = opts;
   try {
-    body = await parseUrlEncoded(req);
+    if (!body) {
+      body = await parseUrlEncoded(req);
+    }
   } catch {
     return sendHtmlError(res, "Error interno del servidor");
   }
@@ -85,13 +88,22 @@ export async function postContact(req, res) {
 
   let messages;
   try {
-    await ensureMessagesFileExists();
-
     const data = await fs.readFile(MESSAGES_FILE, "utf-8");
 
     messages = data.trim() ? JSON.parse(data) : [];
-  } catch {
+  } catch (error) {
     // Cualquier otro error se trata como un error de servidor.
+
+    if (error.code === "ENOENT" && !retried) {
+      await fs.mkdir(DATA_DIR, { recursive: true });
+
+      await fs.writeFile(MESSAGES_FILE, "[]", { flag: "wx" });
+
+      return postContact(req, res, {
+        retried: true,
+        body,
+      });
+    }
     const status = 500; // Internal Server Error
     res.writeHead(status);
     return res.end();

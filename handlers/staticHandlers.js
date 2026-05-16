@@ -1,7 +1,6 @@
-import { readFile } from "node:fs/promises";
+import fs from "node:fs";
 import path from "node:path";
 import mime from "mime-types";
-import { sendHtmlError } from "../utils/response.js";
 import { HttpError } from "../utils/errors.js";
 
 // La ruta se resuelve relativa al Directorio de Trabajo Actual (CWD)
@@ -12,15 +11,21 @@ export async function staticHandler(_req, res, pathname) {
     // Se asume riesgo de Directory Traversal
     const filePath = path.join(PUBLIC_DIR, pathname);
 
-    // Intentar leer el archivo
-    const data = await readFile(filePath);
+    const stats = await fs.promises.stat(filePath);
+
+    if (!stats.isFile()) {
+      throw new HttpError("Recurso no encontrado", 404);
+    }
 
     // Intentar deducir el tipo MIME, fallback a binario genérico
     const mimeType = mime.lookup(filePath) || "application/octet-stream";
 
     // Escribir la cabecera y enviar el archivo
     res.writeHead(200, { "Content-Type": mimeType });
-    return res.end(data);
+
+    const readStream = fs.createReadStream(filePath);
+
+    readStream.pipe(res);
   } catch (error) {
     if (error.code === "ENOENT" || error.code === "EISDIR") {
       throw new HttpError("Recurso no encontrado", 404);

@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import mime from "mime-types";
 import { sendHtmlError } from "../utils/response.js";
+import { HttpError } from "../utils/errors.js";
 
 // La ruta se resuelve relativa al Directorio de Trabajo Actual (CWD)
 const PUBLIC_DIR = path.resolve("public");
@@ -21,17 +22,12 @@ export async function staticHandler(_req, res, pathname) {
     res.writeHead(200, { "Content-Type": mimeType });
     return res.end(data);
   } catch (error) {
-    // Determinar el código de estado basado en el error de sistema
-    let status = 500;
-    let message = "Error interno del servidor";
     if (error.code === "ENOENT" || error.code === "EISDIR") {
-      status = 404;
-      message = "Recurso no encontrado";
+      throw new HttpError("Recurso no encontrado", 404);
     } else if (error.code === "EACCES") {
-      status = 403;
-      message = "Acceso prohibido";
+      throw new HttpError("Acceso denegado", 403);
     }
 
-    return sendHtmlError(res, message, status);
+    throw error;
   }
 }
